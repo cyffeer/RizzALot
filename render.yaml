@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: rizz-a-lot-backend
+    env: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Set either MONGODB_URI or MONGO_URI in Render dashboard for security
+      # - key: MONGODB_URI
+      #   sync: false
+      # - key: MONGO_URI
+      #   sync: false
+      - key: CLIENT_ORIGIN
+        value: https://your-frontend.onrender.com
+    disk:
+      name: uploads
+      mountPath: /var/data
+      sizeGB: 1
