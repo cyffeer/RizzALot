@@ -14,6 +14,45 @@ import { uploadsDir } from './middleware/upload.js';
 
 export const createApp = () => {
   const app = express();
+
+  // trust Render’s proxy so secure cookies work
+  app.set("trust proxy", 1);
+
+  // CORS: allow your prod domain and any Vercel preview domains
+  const configuredOrigins = [
+    process.env.CLIENT_ORIGIN, // e.g., https://rizz-a-lot.vercel.app
+    ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",").map(s => s.trim()) : []),
+  ].filter(Boolean);
+
+  function isAllowedOrigin(origin) {
+    if (!origin) return true; // server-to-server or same-origin
+    if (configuredOrigins.includes(origin)) return true;
+    try {
+      const { hostname } = new URL(origin);
+      if (hostname.endsWith(".vercel.app")) return true; // previews
+    } catch {}
+    return false;
+  }
+  app.use(
+  cors({
+    origin: (origin, cb) => (isAllowedOrigin(origin) ? cb(null, true) : cb(new Error("Not allowed by CORS"))),
+    credentials: true,
+  })
+ );
+
+  // Handle preflight across the board
+  app.options(
+  "*",
+  cors({
+      origin: (origin, cb) => (isAllowedOrigin(origin) ? cb(null, true) : cb(new Error("Not allowed by CORS"))),
+      credentials: true,
+  })
+  );
+
+  // Body and cookies
+  app.use(express.json());
+  app.use(cookieParser());
+
   app.use(cors({ origin: process.env.CLIENT_ORIGIN, credentials: true }));
   app.use(express.json());
   app.use(cookieParser());
@@ -35,7 +74,8 @@ export const createApp = () => {
 
   // 404 handler
   app.use((req, res) => res.status(404).json({ message: 'Not found' }));
-
+  
+  
   // Error handler
   app.use((err, req, res, next) => {
     console.error(err);

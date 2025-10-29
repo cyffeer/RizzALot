@@ -17,6 +17,12 @@ export const register = async (req, res) => {
     const photo = req.file ? `/uploads/${req.file.filename}` : '';
     const user = await User.create({ name, email, password: hash, age, bio: bio || '', photo });
     const token = signToken(user._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,      // required for SameSite=None
+      sameSite: "none",  // allow cross-site from Vercel -> Render
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return res.status(201).json({
       token,
       user: {
@@ -47,6 +53,12 @@ export const login = async (req, res) => {
     if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = signToken(user._id);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,      // required for SameSite=None
+      sameSite: "none",  // allow cross-site from Vercel -> Render
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     return res.json({
       token,
       user: {
