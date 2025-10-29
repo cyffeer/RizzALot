@@ -15,7 +15,7 @@ services:
       # - key: MONGO_URI
       #   sync: false
       - key: CLIENT_ORIGIN
-        value: https://your-frontend.onrender.com
+        value: https://rizz-a-lot.vercel.app
     disk:
       name: uploads
       mountPath: /var/data
