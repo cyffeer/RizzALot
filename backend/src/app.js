@@ -9,6 +9,7 @@ import matchRoutes from './routes/matchRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import starterRoutes from './routes/starterRoutes.js';
+import healthRoutes from './routes/healthRoutes.js';
 import promptRoutes from './routes/promptRoutes.js';
 import { uploadsDir } from './middleware/upload.js';
 
@@ -69,6 +70,7 @@ export const createApp = () => {
   app.use('/api/ai', aiRoutes);
   app.use('/api/starters', starterRoutes);
   app.use('/api/prompts', promptRoutes);
+  app.use('/api', healthRoutes)
 
   app.get('/health', (req, res) => res.json({ ok: true }));
 
