@@ -98,12 +98,12 @@ export default function Discover() {
           {prompt ? (
             <Card>
               <CardBody>
-                <div className="mb-2 text-sm font-semibold text-gray-800">Daily prompt</div>
-                <div className="mb-3 text-sm text-gray-700">{prompt.prompt}</div>
+                <div className="mb-2 text-sm font-semibold text-gray-800 dark:text-gray-200">Daily prompt</div>
+                <div className="mb-3 text-sm text-gray-700 dark:text-gray-300">{prompt.prompt}</div>
                 <div className="flex items-center gap-2">
                   <input className="input flex-1" disabled={prompt.answered} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Your answer" />
                   {!prompt.answered && <Button disabled={saving || !answer.trim()} onClick={saveAnswer}>Submit</Button>}
-                  {prompt.answered && <span className="text-xs text-green-700">Thanks for answering!</span>}
+                  {prompt.answered && <span className="text-xs text-green-600 dark:text-green-400">Thanks for answering!</span>}
                 </div>
               </CardBody>
             </Card>
@@ -171,21 +171,21 @@ export default function Discover() {
                 </div>
               </>
             ) : (
-              <div className="text-center text-sm text-gray-600">No more profiles. Try adjusting filters or click Refresh.</div>
+              <div className="text-center text-sm text-gray-600 dark:text-gray-400">No more profiles. Try adjusting filters or click Refresh.</div>
             )}
           </div>
           {people.length ? (
             <div className="mt-4 flex items-center justify-center gap-6 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
               <Button
                 variant="outline"
-                className="h-14 w-14 rounded-full text-2xl bg-white ring-1 ring-gray-300 text-gray-700 hover:bg-gray-50"
+                className="h-14 w-14 rounded-full text-2xl bg-white ring-1 ring-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-900 dark:text-gray-100 dark:ring-gray-600 dark:hover:bg-gray-800"
                 onClick={() => skip(people[0]._id)}
                 aria-label="Skip"
               >
                 👎
               </Button>
               <Button
-                className="h-14 w-14 rounded-full text-2xl bg-white ring-2 ring-red-500 text-red-600 hover:bg-red-50"
+                className="h-14 w-14 rounded-full text-2xl bg-white ring-2 ring-red-500 text-red-600 hover:bg-red-50 dark:bg-gray-900 dark:text-red-400 dark:ring-red-500/80 dark:hover:bg-gray-800"
                 onClick={() => like(people[0]._id)}
                 aria-label="Like"
               >

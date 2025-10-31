@@ -118,7 +118,7 @@ export default function Chat() {
         <Button onClick={suggest} disabled={suggesting} variant="secondary">
           {suggesting ? 'Thinking…' : 'Suggest pickup line'}
         </Button>
-        {suggestion && <span className="text-sm italic text-gray-600">{suggestion}</span>}
+        {suggestion && <span className="text-sm italic text-gray-600 dark:text-gray-400">{suggestion}</span>}
       </div>
 
       <Card>
@@ -133,7 +133,7 @@ export default function Chat() {
               return (
                 <div key={m._id} className="space-y-1">
                   <ChatBubble message={m} align={align} reactions={m.reactions} senderName={senderName} />
-                  <div className={`flex items-center gap-2 text-xs ${mine ? 'justify-end text-gray-500' : 'justify-start text-gray-600'}`}>
+                  <div className={`flex items-center gap-2 text-xs ${mine ? 'justify-end text-gray-500 dark:text-gray-400' : 'justify-start text-gray-600 dark:text-gray-400'}`}>
                     <button type="button" className="hover:opacity-80" onClick={() => react(m._id, 'love')}>❤️ {c.love || ''}</button>
                     <button type="button" className="hover:opacity-80" onClick={() => react(m._id, 'like')}>👍 {c.like || ''}</button>
                     <button type="button" className="hover:opacity-80" onClick={() => react(m._id, 'funny')}>😂 {c.funny || ''}</button>
@@ -145,7 +145,7 @@ export default function Chat() {
         </CardBody>
       </Card>
 
-      <form onSubmit={send} className="sticky bottom-0 z-10 flex items-center gap-2 bg-gray-50/60 py-2 backdrop-blur supports-[backdrop-filter]:bg-gray-50/60">
+      <form onSubmit={send} className="sticky bottom-0 z-10 flex items-center gap-2 bg-gray-50/60 py-2 backdrop-blur supports-[backdrop-filter]:bg-gray-50/60 dark:bg-gray-900/60 supports-[backdrop-filter]:dark:bg-gray-900/60">
         <input className="input flex-1" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message" />
         <Button type="submit">Send</Button>
       </form>

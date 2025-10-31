@@ -64,7 +64,7 @@ export default function Questions() {
     }
   }
 
-  if (!options) return <div className="text-sm text-gray-600">Loading questions…</div>
+  if (!options) return <div className="text-sm text-gray-600 dark:text-gray-400">Loading questions…</div>
 
   return (
     <div className="space-y-4">
@@ -74,12 +74,17 @@ export default function Questions() {
           <form onSubmit={submit} className="grid gap-6">
             <section className="space-y-2">
               <h3 className="text-sm font-semibold">Gender</h3>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2">
                 {options.genders.map((g) => (
-                  <label key={g} className="inline-flex items-center gap-2 text-sm">
-                    <input type="radio" name="gender" checked={form.gender === g} onChange={() => setForm((f) => ({ ...f, gender: g }))} />
-                    {g}
-                  </label>
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, gender: g }))}
+                    className={`chip ${form.gender === g
+                      ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                    aria-pressed={form.gender === g}
+                  >{g}</button>
                 ))}
               </div>
             </section>
@@ -88,7 +93,14 @@ export default function Questions() {
               <h3 className="text-sm font-semibold">Looking for</h3>
               <div className="flex flex-wrap gap-2">
                 {options.genders.map((g) => (
-                  <button key={g} type="button" onClick={toggle('lookingFor', g)} className={`chip ${form.lookingFor.includes(g) ? 'bg-brand text-white' : ''}`}>{g}</button>
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={toggle('lookingFor', g)}
+                    className={`chip ${form.lookingFor.includes(g)
+                      ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                  >{g}</button>
                 ))}
               </div>
             </section>
@@ -97,7 +109,14 @@ export default function Questions() {
               <h3 className="text-sm font-semibold">Music genres</h3>
               <div className="flex flex-wrap gap-2">
                 {options.musicGenres.map((v) => (
-                  <button key={v} type="button" onClick={toggle('musicGenres', v)} className={`chip ${form.musicGenres.includes(v) ? 'bg-brand text-white' : ''}`}>{v}</button>
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={toggle('musicGenres', v)}
+                    className={`chip ${form.musicGenres.includes(v)
+                      ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                  >{v}</button>
                 ))}
               </div>
             </section>
@@ -106,7 +125,14 @@ export default function Questions() {
               <h3 className="text-sm font-semibold">Hobbies</h3>
               <div className="flex flex-wrap gap-2">
                 {options.hobbies.map((v) => (
-                  <button key={v} type="button" onClick={toggle('hobbies', v)} className={`chip ${form.hobbies.includes(v) ? 'bg-brand text-white' : ''}`}>{v}</button>
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={toggle('hobbies', v)}
+                    className={`chip ${form.hobbies.includes(v)
+                      ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                  >{v}</button>
                 ))}
               </div>
             </section>
@@ -115,7 +141,14 @@ export default function Questions() {
               <h3 className="text-sm font-semibold">Passions</h3>
               <div className="flex flex-wrap gap-2">
                 {options.passions.map((v) => (
-                  <button key={v} type="button" onClick={toggle('passions', v)} className={`chip ${form.passions.includes(v) ? 'bg-brand text-white' : ''}`}>{v}</button>
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={toggle('passions', v)}
+                    className={`chip ${form.passions.includes(v)
+                      ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                  >{v}</button>
                 ))}
               </div>
             </section>

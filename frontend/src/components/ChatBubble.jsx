@@ -6,9 +6,9 @@ export default function ChatBubble({ message, align = 'left', reactions = [], se
   reactions.forEach((r) => { if (counts[r.type] !== undefined) counts[r.type]++ })
   return (
     <div className={`flex ${isRight ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ring-1 ${isRight ? 'bg-brand text-white ring-brand/10' : 'bg-white text-gray-900 ring-gray-200'}`}>
-        <div className={`mb-1 flex items-center justify-between gap-3 text-[11px] ${isRight ? 'text-white/80' : 'text-gray-600'}`}>
-          <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium ${isRight ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-800'}`}>
+      <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ring-1 ${isRight ? 'bg-brand text-white ring-brand/10' : 'bg-white text-gray-900 ring-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700'}`}>
+        <div className={`mb-1 flex items-center justify-between gap-3 text-[11px] ${isRight ? 'text-white/80' : 'text-gray-600 dark:text-gray-400'}`}>
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium ${isRight ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}`}>
             {senderName || (isRight ? 'You' : 'Them')}
           </span>
           <span className="opacity-80">{new Date(message.createdAt).toLocaleString()}</span>

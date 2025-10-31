@@ -24,7 +24,7 @@ export default function Matches() {
                   <Avatar src={photo} name={m.otherUser?.name} size={56} />
                   <div>
                     <div className="text-base font-semibold">{m.otherUser?.name}</div>
-                    <div className="text-sm text-gray-600">{m.lastMessage || 'Say hi!'}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{m.lastMessage || 'Say hi!'}</div>
                   </div>
                 </Link>
               </CardBody>

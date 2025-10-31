@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
 import Card, { CardBody, CardHeader } from '../components/Card'
@@ -11,6 +11,7 @@ export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '', age: 18, bio: '' })
   const [photo, setPhoto] = useState(null)
   const [error, setError] = useState('')
+  const fileInputRef = useRef(null)
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -41,10 +42,15 @@ export default function Register() {
             <TextArea label="Bio" placeholder="Tell people about yourself" value={form.bio} onChange={update('bio')} />
             <div>
               <label className="label">Profile photo</label>
-              <input className="block w-full text-sm" type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+              <div className="flex items-center gap-3">
+                <input ref={fileInputRef} className="sr-only" type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>Upload photo</Button>
+                {photo && <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[12rem]">{photo.name}</span>}
+              </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">JPG or PNG, up to 5MB.</p>
             </div>
             <Button type="submit" className="w-full">Create account</Button>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           </form>
         </CardBody>
       </Card>

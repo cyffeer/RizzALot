@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../utils/api'
 import { useAuth } from '../state/AuthContext'
 import Card, { CardBody, CardHeader } from '../components/Card'
@@ -14,6 +14,8 @@ export default function Profile() {
   const [photo, setPhoto] = useState(null)
   const [photos, setPhotos] = useState([])
   const [uploading, setUploading] = useState(false)
+  const singleInputRef = useRef(null)
+  const multiInputRef = useRef(null)
 
   useEffect(() => {
     if (user) {
@@ -84,7 +86,7 @@ export default function Profile() {
       <h2 className="text-2xl font-semibold">My Profile</h2>
       <div className="flex items-center gap-4">
         <Avatar src={user.photo ? (user.photo.startsWith('http') ? user.photo : import.meta.env.VITE_API_BASE_URL + user.photo) : ''} name={user.name} size={80} />
-        <div className="text-sm text-gray-600">Update your profile and interests to get better matches.</div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">Update your profile and interests to get better matches.</div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -95,7 +97,7 @@ export default function Profile() {
               <TextInput label="Name" value={form.name} onChange={update('name')} />
               <TextInput label="Age" type="number" value={form.age} onChange={update('age')} />
               <TextArea label="Bio" value={form.bio} onChange={update('bio')} />
-              {options && (
+                {options && (
                 <div>
                   <div className="label">Gender</div>
                   <div className="flex flex-wrap gap-2">
@@ -104,7 +106,9 @@ export default function Profile() {
                         key={g}
                         type="button"
                         onClick={() => setForm((f) => ({ ...f, gender: g }))}
-                        className={`chip ${form.gender === g ? 'bg-brand text-white' : ''}`}
+                        className={`chip ${form.gender === g
+                          ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
                       >
                         {g && g.length ? g.charAt(0).toUpperCase() + g.slice(1) : g}
                       </button>
@@ -114,22 +118,31 @@ export default function Profile() {
               )}
               <div>
                 <label className="label">Photo</label>
-                <input className="block w-full text-sm" type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                <div className="flex items-center gap-3">
+                  <input ref={singleInputRef} className="sr-only" type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                  <Button type="button" variant="outline" onClick={() => singleInputRef.current?.click()}>Upload photo</Button>
+                  {photo && <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[12rem]">{photo.name}</span>}
+                </div>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">JPG or PNG, up to 5MB.</p>
               </div>
               {photos && photos.length ? (
                 <div>
                   <div className="label">Your photos</div>
                   <div className="grid grid-cols-3 gap-2">
                     {photos.map((p, i) => (
-                      <img key={i} src={p.startsWith('http') ? p : (import.meta.env.VITE_API_BASE_URL + p)} alt="profile" className="h-24 w-full rounded-lg object-cover" />
+                      <img key={i} src={p.startsWith('http') ? p : (import.meta.env.VITE_API_BASE_URL + p)} alt="profile" className="h-24 w-full rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm" />
                     ))}
                   </div>
                 </div>
               ) : null}
               <div>
                 <label className="label">Add more photos</label>
-                <input className="block w-full text-sm" type="file" accept="image/*" multiple onChange={(e) => uploadPhotos(e.target.files)} />
-                {uploading && <div className="mt-1 text-xs text-gray-500">Uploading…</div>}
+                <div className="flex items-center gap-3">
+                  <input ref={multiInputRef} className="sr-only" type="file" accept="image/*" multiple onChange={(e) => uploadPhotos(e.target.files)} />
+                  <Button type="button" variant="outline" onClick={() => multiInputRef.current?.click()}>Add photos</Button>
+                  {uploading && <div className="text-xs text-gray-500 dark:text-gray-400">Uploading…</div>}
+                </div>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">You can select multiple files.</p>
               </div>
               <div>
                 <Button type="submit">Save</Button>
@@ -151,7 +164,9 @@ export default function Profile() {
                         key={g}
                         type="button"
                         onClick={() => toggle('lookingFor', g)}
-                        className={`chip ${interests.lookingFor.includes(g) ? 'bg-brand text-white' : ''}`}
+                        className={`chip ${interests.lookingFor.includes(g)
+                          ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
                       >
                         {g && g.length ? g.charAt(0).toUpperCase() + g.slice(1) : g}
                       </button>
@@ -162,7 +177,14 @@ export default function Profile() {
                   <div className="label">Music</div>
                   <div className="flex flex-wrap gap-2">
                     {options.musicGenres.map((v) => (
-                      <button key={v} type="button" onClick={() => toggle('musicGenres', v)} className={`chip ${interests.musicGenres.includes(v) ? 'bg-brand text-white' : ''}`}>{v}</button>
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => toggle('musicGenres', v)}
+                        className={`chip ${interests.musicGenres.includes(v)
+                          ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                      >{v}</button>
                     ))}
                   </div>
                 </div>
@@ -170,7 +192,14 @@ export default function Profile() {
                   <div className="label">Hobbies</div>
                   <div className="flex flex-wrap gap-2">
                     {options.hobbies.map((v) => (
-                      <button key={v} type="button" onClick={() => toggle('hobbies', v)} className={`chip ${interests.hobbies.includes(v) ? 'bg-brand text-white' : ''}`}>{v}</button>
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => toggle('hobbies', v)}
+                        className={`chip ${interests.hobbies.includes(v)
+                          ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                      >{v}</button>
                     ))}
                   </div>
                 </div>
@@ -178,7 +207,14 @@ export default function Profile() {
                   <div className="label">Passions</div>
                   <div className="flex flex-wrap gap-2">
                     {options.passions.map((v) => (
-                      <button key={v} type="button" onClick={() => toggle('passions', v)} className={`chip ${interests.passions.includes(v) ? 'bg-brand text-white' : ''}`}>{v}</button>
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => toggle('passions', v)}
+                        className={`chip ${interests.passions.includes(v)
+                          ? 'bg-brand text-white hover:bg-brand-dark ring-1 ring-brand/30 dark:ring-brand/40'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700'} focus:outline-none focus:ring-2 focus:ring-brand/50`}
+                      >{v}</button>
                     ))}
                   </div>
                 </div>

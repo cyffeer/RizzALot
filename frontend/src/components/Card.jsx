@@ -4,10 +4,10 @@ export default function Card({ children, className='' }) {
 
 export function CardHeader({ title, subtitle, actions }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4">
+    <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4 dark:border-gray-700">
       <div>
         {title && <h3 className="text-base font-semibold">{title}</h3>}
-        {subtitle && <p className="text-sm text-gray-600">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>}
       </div>
       {actions}
     </div>
@@ -19,5 +19,5 @@ export function CardBody({ children, className='' }) {
 }
 
 export function CardFooter({ children }) {
-  return <div className="border-t border-gray-100 px-5 py-4">{children}</div>
+  return <div className="border-t border-gray-100 px-5 py-4 dark:border-gray-700">{children}</div>
 }

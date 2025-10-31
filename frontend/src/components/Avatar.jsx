@@ -5,7 +5,7 @@ export default function Avatar({ src, name = '', size = 40 }) {
     return <img src={src} alt={name} className="rounded-full object-cover" style={style} />
   }
   return (
-    <div className="rounded-full bg-gray-200 text-gray-700 inline-flex items-center justify-center font-semibold" style={style}>
+    <div className="rounded-full bg-gray-200 text-gray-700 inline-flex items-center justify-center font-semibold dark:bg-gray-700 dark:text-gray-200" style={style}>
       {initials || 'U'}
     </div>
   )

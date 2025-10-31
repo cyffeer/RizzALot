@@ -145,12 +145,12 @@ export default function SwipeCard({ person, onLike, onSkip, disabled = false, is
       onPointerCancel={onPointerUp}
       style={style}
     >
-      <div className="relative overflow-hidden rounded-2xl bg-gray-200 shadow-md h-[68vh] sm:h-[520px]">
+      <div className="relative overflow-hidden rounded-2xl bg-gray-200 shadow-md h-[68vh] sm:h-[520px] dark:bg-gray-800">
         {/* Photo */}
         {currentPhoto ? (
           <img src={currentPhoto} alt={person?.name} className="absolute inset-0 h-full w-full object-cover select-none pointer-events-none" draggable={false} />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
             <Avatar src="" name={person?.name} size={96} />
           </div>
         )}
@@ -187,7 +187,7 @@ export default function SwipeCard({ person, onLike, onSkip, disabled = false, is
           {person?.mutual?.shared?.length ? (
             <div className="pointer-events-auto mt-3 flex flex-wrap gap-2">
               {person.mutual.shared.slice(0,5).map((t, i) => (
-                <Badge key={i} className="bg-white/90 text-gray-800">{t}</Badge>
+                <Badge key={i} className="bg-white/90 text-gray-800 dark:bg-white/20 dark:text-white">{t}</Badge>
               ))}
             </div>
           ) : null}
@@ -195,25 +195,25 @@ export default function SwipeCard({ person, onLike, onSkip, disabled = false, is
 
         {/* Details sheet */}
         {showDetails && (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 max-h-[55%] overflow-y-auto rounded-t-2xl bg-white/95 backdrop-blur p-4 shadow-lg">
+          <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 max-h-[55%] overflow-y-auto rounded-t-2xl bg-white/95 backdrop-blur p-4 shadow-lg dark:bg-gray-900/95">
             <div className="flex items-start justify-between">
-              <div className="text-sm font-semibold text-gray-900">Profile info</div>
+              <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">Profile info</div>
               <button
                 type="button"
                 aria-label="Close info"
-                className="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                 onPointerDown={(e)=>e.stopPropagation()}
                 onClick={() => setShowDetails(false)}
               >
                 ✕
               </button>
             </div>
-            {person?.bio ? <p className="text-gray-800 text-sm leading-relaxed">{person.bio}</p> : null}
+            {person?.bio ? <p className="text-gray-800 text-sm leading-relaxed dark:text-gray-200">{person.bio}</p> : null}
             {person?.profileQuestions && (
               <div className="mt-3 space-y-2 text-sm">
                 {person.profileQuestions.musicGenres?.length ? (
                   <div>
-                    <div className="text-gray-700 font-semibold mb-1">Music</div>
+                    <div className="text-gray-700 font-semibold mb-1 dark:text-gray-300">Music</div>
                     <div className="flex flex-wrap gap-2">
                       {person.profileQuestions.musicGenres.map((g, i) => <Badge key={i}>{g}</Badge>)}
                     </div>
@@ -221,7 +221,7 @@ export default function SwipeCard({ person, onLike, onSkip, disabled = false, is
                 ) : null}
                 {person.profileQuestions.hobbies?.length ? (
                   <div>
-                    <div className="text-gray-700 font-semibold mb-1">Hobbies</div>
+                    <div className="text-gray-700 font-semibold mb-1 dark:text-gray-300">Hobbies</div>
                     <div className="flex flex-wrap gap-2">
                       {person.profileQuestions.hobbies.map((g, i) => <Badge key={i}>{g}</Badge>)}
                     </div>
@@ -229,7 +229,7 @@ export default function SwipeCard({ person, onLike, onSkip, disabled = false, is
                 ) : null}
                 {person.profileQuestions.passions?.length ? (
                   <div>
-                    <div className="text-gray-700 font-semibold mb-1">Passions</div>
+                    <div className="text-gray-700 font-semibold mb-1 dark:text-gray-300">Passions</div>
                     <div className="flex flex-wrap gap-2">
                       {person.profileQuestions.passions.map((g, i) => <Badge key={i}>{g}</Badge>)}
                     </div>
@@ -237,8 +237,8 @@ export default function SwipeCard({ person, onLike, onSkip, disabled = false, is
                 ) : null}
                 {person.profileQuestions.about ? (
                   <div>
-                    <div className="text-gray-700 font-semibold mb-1">About</div>
-                    <p className="text-gray-800">{person.profileQuestions.about}</p>
+                    <div className="text-gray-700 font-semibold mb-1 dark:text-gray-300">About</div>
+                    <p className="text-gray-800 dark:text-gray-200">{person.profileQuestions.about}</p>
                   </div>
                 ) : null}
               </div>
