@@ -1,91 +1,118 @@
-# Rizz-A-Lot (MVP)
+# Rizz‑A‑Lot
 
-Full-stack dating app MVP with React (frontend), Node/Express (backend), MongoDB (Mongoose), JWT auth, image uploads, and Socket.io chat.
+A full‑stack dating app MVP featuring swipes/matches, profiles, realtime chat with reactions, daily prompts, and image uploads. Built with React + Vite (frontend), Node.js/Express (backend), MongoDB (Mongoose), JWT auth, Multer uploads, and Socket.io.
 
-## Structure
+## What this system is
 
-- `backend/` – Express API, MongoDB models, JWT auth, Multer uploads, Socket.io.
-- `frontend/` – React + Vite app with pages for auth, profile, discover, matches, and chat.
-- `server/` – Existing folder (not used by this setup). Safe to ignore or remove later.
+Rizz‑A‑Lot is a minimal yet complete dating app stack you can run locally or deploy:
 
-## Backend
+- Account creation and login with JWT
+- Edit profile: name, age (18+ enforced), bio, interests, photo
+- Discover and swipe: like or skip suggested users
+- Automatic matches when two users like each other
+- Realtime chat for matched users (Socket.io) with simple reactions
+- Daily prompt questions and answers
+- Image upload and serving; works locally and in the cloud
 
-1. Copy backend env example and adjust:
+It’s organized as a two‑package monorepo:
 
-```bash
-cp backend/.env.example backend/.env
+- `backend/` – Express REST API, MongoDB models, JWT auth, Multer uploads, Socket.io gateway
+- `frontend/` – React + Vite SPA using Tailwind CSS and a small component library
+
+## Architecture overview
+
+- Frontend (Vite on port 5173) calls the API at `${VITE_API_BASE_URL}/api`, defaults to `http://localhost:5000/api` in dev.
+- Backend (Express on port 5000) exposes routes under `/api/*` and serves uploaded images at `/uploads/*`.
+- Socket.io runs on the backend HTTP server; the client authenticates using the same JWT.
+- MongoDB (Atlas or local) stores users, matches, and messages.
+- Optional cloud image storage via Cloudinary for deployments without persistent disks.
+
+```
+React (Vite)  ↔  Express API  ↔  MongoDB
+			│             │
+			└── Socket.io ┘
+			│
+	 Image uploads (local uploads/ or Cloudinary)
 ```
 
-Update values as needed (Windows users can create the `.env` file manually).
+## Prerequisites
 
-2. Install and run backend:
+- Node.js 18.18+ (LTS recommended)
+- A MongoDB connection string (Atlas or local)
+- Windows PowerShell (this README uses PowerShell‑friendly commands)
 
-```bash
+## Quick start (local dev)
+
+1) Clone and install dependencies
+
+```powershell
+# From the repo root
+cd backend; npm install; cd ..
+cd frontend; npm install; cd ..
+```
+
+2) Create environment files
+
+```powershell
+# Backend
+Copy-Item backend/.env.example backend/.env
+
+# Frontend
+Copy-Item frontend/.env.example frontend/.env
+```
+
+3) Configure env values
+
+- Edit `backend/.env` and set:
+	- `MONGODB_URI` (or `MONGO_URI`) – your MongoDB URL
+	- `JWT_SECRET` – any strong random string
+	- `CLIENT_ORIGIN` – `http://localhost:5173` for local dev
+	- Optional: `PORT` (defaults to 5000), `UPLOADS_DIR`, `DB_NAME`
+- Edit `frontend/.env` and set:
+	- `VITE_API_BASE_URL=http://localhost:5000`
+	- `VITE_SOCKET_URL=http://localhost:5000`
+
+4) Run the servers (two terminals)
+
+```powershell
+# Terminal A (API)
 cd backend
-npm install
 npm run dev
-```
 
-API runs at http://localhost:5000
-
-## Frontend
-
-1. Copy frontend env example and adjust:
-
-```bash
-cp frontend/.env.example frontend/.env
-```
-
-2. Install and run frontend:
-
-```bash
+# Terminal B (Web)
 cd frontend
-npm install
 npm run dev
 ```
 
-App runs at http://localhost:5173
+- API: http://localhost:5000
+- App: http://localhost:5173
 
-### UI & Tailwind CSS
+## How to use the app
 
-The frontend uses Tailwind CSS for styling with a small set of reusable components:
+1) Register a user via the UI (email + password + basic profile). A profile photo can be uploaded.
+2) Log in; a JWT is stored in localStorage and used for API and Socket.io calls.
+3) Update your profile: add bio, interests, and set a photo.
+4) Discover people on the Discover page; like or skip.
+5) When two users like each other, a match is created and appears in Matches.
+6) Chat with your matches in realtime; send messages and simple reactions.
+7) Answer the daily prompt to enrich your profile.
 
-- `src/components/Layout.jsx` – page shell with navbar and footer
-- `src/components/Button.jsx` – primary/secondary/outline/ghost variants
-- `src/components/Input.jsx` – labeled inputs and text areas
-- `src/components/Card.jsx` – card wrapper with header/body/footer helpers
-- `src/components/Avatar.jsx` – circular avatar with initials fallback
-- `src/components/Badge.jsx` – small pill badge used for tags/chips
-- `src/components/ChatBubble.jsx` – message bubble with reaction summary
+## Deployment
 
-Global styles and Tailwind utilities live in `src/index.css`. Tailwind is configured through `tailwind.config.js` and `postcss.config.js`.
+### Backend on Render
 
-Pages are refactored to use these components for a consistent, responsive design:
+- `render.yaml` is included. It sets up a Node web service using `backend/` with a 1 GB persistent disk mounted at `/var/data`.
+- In Render Dashboard, set env vars:
+	- `MONGODB_URI`
+	- `JWT_SECRET`
+	- `CLIENT_ORIGIN=https://<your-frontend-domain>`
+	- Optional: `UPLOADS_DIR=/var/data/uploads` (the folder will be created automatically)
 
-- Discover has profile cards, intent filters, and a daily prompt banner.
-- Matches shows a clean list with avatars.
-- Chat includes message bubbles, starter chips, and reaction buttons.
-- Profile separates basic info and interests into cards with selectable chips.
-- Questions uses chips for multi-select fields and a tidy layout.
+### Frontend on Vercel/Netlify
 
-## API Summary
+- Build as a static site (Vite): set env vars
+	- `VITE_API_BASE_URL=https://<your-backend-domain>`
+	- `VITE_SOCKET_URL=https://<your-backend-domain>`
 
-- Auth: `POST /api/auth/register` (multipart: name,email,password,age,bio,photo), `POST /api/auth/login`, `GET /api/auth/me`
-- Users: `GET /api/users/me`, `PUT /api/users/me` (multipart), `GET /api/users/discover`, `POST /api/users/like/:id`, `POST /api/users/skip/:id`
-- Matches: `GET /api/matches`
-- Messages: `GET /api/messages/:matchId`, `POST /api/messages/:matchId`
+Ensure CORS allows your frontend domain (`CLIENT_ORIGIN`) and that your Socket.io server uses the same origin in `initSocket`.
 
-All endpoints (except `register` and `login`) require `Authorization: Bearer <token>` header.
-
-## Notes
-
-- Images are stored in `backend/uploads` and served at `/uploads/<file>`.
-- Socket.io connects using the JWT token; clients must join a match room before sending messages.
-- Minimum age enforced at 18.
-
-## Next steps
-
-- Add pagination to matches and messages.
-- Improve validation and error messages.
-- Add typing indicators and online presence in chat.
-- Deploy with environment-specific configs.
