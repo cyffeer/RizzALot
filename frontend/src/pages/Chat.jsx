@@ -6,6 +6,8 @@ import Card, { CardBody } from '../components/Card'
 import Button from '../components/Button'
 import ChatBubble from '../components/ChatBubble'
 import { useAuth } from '../state/AuthContext'
+import Avatar from '../components/Avatar'
+import Badge from '../components/Badge'
 
 export default function Chat() {
   const { matchId } = useParams()
@@ -18,6 +20,8 @@ export default function Chat() {
   const [mutual, setMutual] = useState([])
   const [starters, setStarters] = useState([])
   const [other, setOther] = useState(null)
+  const [showProfile, setShowProfile] = useState(false)
+  const [otherLoading, setOtherLoading] = useState(true)
   const socketRef = useRef(null)
 
   useEffect(() => {
@@ -28,6 +32,7 @@ export default function Chat() {
       setMutual(data.mutual?.shared || [])
       setOther(data.otherUser || null)
     }).catch(() => {})
+      .finally(() => setOtherLoading(false))
     api.get(`/starters`, { params: { matchId } }).then(({ data }) => setStarters(data.starters || [])).catch(() => {})
   }, [matchId])
 
@@ -92,7 +97,14 @@ export default function Chat() {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-2xl font-semibold">Chat</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Chat</h2>
+        {(otherLoading || other) ? (
+          <Button variant="outline" onClick={() => other && setShowProfile(true)} className="text-sm" disabled={!other}>
+            View profile
+          </Button>
+        ) : null}
+      </div>
       {(reasons.length || mutual.length) ? (
         <Card>
           <CardBody>
@@ -118,6 +130,11 @@ export default function Chat() {
         <Button onClick={suggest} disabled={suggesting} variant="secondary">
           {suggesting ? 'Thinking…' : 'Suggest pickup line'}
         </Button>
+        {(otherLoading || other) ? (
+          <Button variant="outline" onClick={() => other && setShowProfile(true)} disabled={!other}>
+            View profile
+          </Button>
+        ) : null}
         {suggestion && <span className="text-sm italic text-gray-600 dark:text-gray-400">{suggestion}</span>}
       </div>
 
@@ -149,6 +166,97 @@ export default function Chat() {
         <input className="input flex-1" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message" />
         <Button type="submit">Send</Button>
       </form>
+
+      {/* Profile quick view modal */}
+      {showProfile && other && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* backdrop */}
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowProfile(false)} />
+          {/* sheet/card */}
+          <div className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-gray-900">
+            <div className="flex items-center justify-between border-b px-4 py-3 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <Avatar src={(other.photo && (other.photo.startsWith?.('http') ? other.photo : (import.meta.env.VITE_API_BASE_URL + other.photo))) || ''} name={other.name} size={40} />
+                <div className="leading-tight">
+                  <div className="font-semibold">{other.name}{other.age ? `, ${other.age}` : ''}</div>
+                  {other.gender ? <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">{other.gender}</div> : null}
+                </div>
+              </div>
+              <button type="button" aria-label="Close" className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200" onClick={() => setShowProfile(false)}>
+                ✕
+              </button>
+            </div>
+
+            {other.photo ? (
+              <img
+                src={other.photo.startsWith?.('http') ? other.photo : (import.meta.env.VITE_API_BASE_URL + other.photo)}
+                alt={other.name}
+                className="h-56 w-full object-cover"
+              />
+            ) : null}
+
+            <div className="space-y-3 p-4">
+              {other.bio ? (
+                <p className="text-sm leading-relaxed text-gray-800 dark:text-gray-200">{other.bio}</p>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">No bio provided.</p>
+              )}
+
+              {/* Mutual interests from match details, if available */}
+              {Array.isArray(mutual) && mutual.length ? (
+                <div>
+                  <div className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Mutual interests</div>
+                  <div className="flex flex-wrap gap-2">
+                    {mutual.slice(0, 12).map((t, i) => (
+                      <Badge key={i}>{t}</Badge>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Profile questions if provided */}
+              {other.profileQuestions ? (
+                <div className="space-y-2 text-sm">
+                  {other.profileQuestions.musicGenres?.length ? (
+                    <div>
+                      <div className="mb-1 font-semibold text-gray-700 dark:text-gray-300">Music</div>
+                      <div className="flex flex-wrap gap-2">
+                        {other.profileQuestions.musicGenres.map((g, i) => <Badge key={i}>{g}</Badge>)}
+                      </div>
+                    </div>
+                  ) : null}
+                  {other.profileQuestions.hobbies?.length ? (
+                    <div>
+                      <div className="mb-1 font-semibold text-gray-700 dark:text-gray-300">Hobbies</div>
+                      <div className="flex flex-wrap gap-2">
+                        {other.profileQuestions.hobbies.map((g, i) => <Badge key={i}>{g}</Badge>)}
+                      </div>
+                    </div>
+                  ) : null}
+                  {other.profileQuestions.passions?.length ? (
+                    <div>
+                      <div className="mb-1 font-semibold text-gray-700 dark:text-gray-300">Passions</div>
+                      <div className="flex flex-wrap gap-2">
+                        {other.profileQuestions.passions.map((g, i) => <Badge key={i}>{g}</Badge>)}
+                      </div>
+                    </div>
+                  ) : null}
+                  {other.profileQuestions.about ? (
+                    <div>
+                      <div className="mb-1 font-semibold text-gray-700 dark:text-gray-300">About</div>
+                      <p className="text-gray-800 dark:text-gray-200">{other.profileQuestions.about}</p>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="flex justify-end pt-2">
+                <Button variant="secondary" onClick={() => setShowProfile(false)}>Close</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

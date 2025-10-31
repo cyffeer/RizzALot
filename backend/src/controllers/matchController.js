@@ -21,7 +21,10 @@ export const getMyMatches = async (req, res) => {
 export const getMatchDetails = async (req, res) => {
   const { id } = req.params;
   const match = await Match.findById(id).populate({ path: 'users', select: 'name age bio photo gender profileQuestions' });
-  if (!match || !match.users.map(String).includes(String(req.user.id))) {
+  // When populated, match.users contains User documents, not ObjectIds
+  // Ensure membership check uses user._id
+  const isMember = match && match.users.some((u) => String(u._id) === String(req.user.id));
+  if (!match || !isMember) {
     return res.status(403).json({ message: 'Not authorized' });
   }
   const other = match.users.find((u) => String(u._id) !== String(req.user.id));
