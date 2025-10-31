@@ -3,10 +3,14 @@ import jwt from 'jsonwebtoken';
 import Match from '../models/Match.js';
 import Message from '../models/Message.js';
 
+let ioInstance = null;
+export const getIO = () => ioInstance;
+
 export const initSocket = (httpServer, corsOrigin) => {
   const io = new Server(httpServer, {
     cors: { origin: corsOrigin, methods: ['GET', 'POST'] }
   });
+  ioInstance = io;
 
   io.use((socket, next) => {
     try {
@@ -21,6 +25,10 @@ export const initSocket = (httpServer, corsOrigin) => {
   });
 
   io.on('connection', (socket) => {
+    // Join a personal room for user-wide notifications
+    if (socket.userId) {
+      socket.join(`user:${socket.userId}`);
+    }
     socket.on('joinMatch', async (matchId) => {
       const match = await Match.findById(matchId);
       if (!match || !match.users.map(String).includes(String(socket.userId))) return;
@@ -36,6 +44,14 @@ export const initSocket = (httpServer, corsOrigin) => {
       match.lastMessage = content;
       await match.save();
       io.to(`match:${matchId}`).emit('message', message);
+      // Also emit a user-level notification to the recipient
+      io.to(`user:${recipient}`).emit('newMessage', {
+        matchId,
+        messageId: message._id,
+        from: String(socket.userId),
+        content: message.content,
+        createdAt: message.createdAt
+      });
     });
 
     socket.on('react', async ({ matchId, messageId, type }) => {

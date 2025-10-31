@@ -3,6 +3,7 @@ import Logo from './Logo'
 import Button from './Button'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext'
+import GlobalEvents from './GlobalEvents'
 
 export default function Layout({ children }) {
   const { token, logout } = useAuth()
@@ -38,6 +39,7 @@ export default function Layout({ children }) {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
   return (
     <div className="min-h-full">
+      <GlobalEvents />
       <header className="border-b border-gray-200 bg-white/60 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-gray-800 dark:bg-gray-900/60 supports-[backdrop-filter]:dark:bg-gray-900/60">
         <div className="container-app flex h-16 items-center justify-between">
           <Link to="/"><Logo /></Link>

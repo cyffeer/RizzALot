@@ -4,6 +4,7 @@ import { computeMutualInterests } from '../utils/matchUtils.js';
 import fs from 'fs';
 import path from 'path';
 import { uploadsDir } from '../middleware/upload.js';
+import { getIO } from '../sockets/chat.js';
 
 // Static options for onboarding questions (can be moved to DB later)
 export const questionOptions = {
@@ -171,6 +172,17 @@ export const likeUser = async (req, res) => {
     if (!match) {
       match = await Match.create({ users: [req.user.id, targetId] });
     }
+    // Emit a real-time notification to both users
+    try {
+      const io = getIO?.();
+      if (io) {
+        // Prepare lightweight payloads for each user
+        const meSafe = { id: me._id, name: me.name, photo: me.photo, age: me.age };
+        const targetSafe = { id: target._id, name: target.name, photo: target.photo, age: target.age };
+        io.to(`user:${targetId}`).emit('newMatch', { matchId: match._id, other: meSafe });
+        io.to(`user:${req.user.id}`).emit('newMatch', { matchId: match._id, other: targetSafe });
+      }
+    } catch {}
   }
 
   return res.json({ liked: true, matchCreated: !!match, matchId: match?._id || null });
