@@ -66,6 +66,17 @@ export default function Profile() {
     }
   }
 
+  const handleDeletePhoto = async (p) => {
+    try {
+      const { data } = await api.delete('/users/me/photos', { params: { path: p } })
+      setUser(data)
+      setPhotos(Array.isArray(data.photos) ? data.photos : (data.photo ? [data.photo] : []))
+    } catch (e) {
+      // no-op; could show a toast in the future
+      console.error('Failed to delete photo', e)
+    }
+  }
+
   const saveInterests = async () => {
     const payload = {
       gender: form.gender,
@@ -130,7 +141,18 @@ export default function Profile() {
                   <div className="label">Your photos</div>
                   <div className="grid grid-cols-3 gap-2">
                     {photos.map((p, i) => (
-                      <img key={i} src={p.startsWith('http') ? p : (import.meta.env.VITE_API_BASE_URL + p)} alt="profile" className="h-24 w-full rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm" />
+                      <div key={i} className="relative group">
+                        <img src={p.startsWith('http') ? p : (import.meta.env.VITE_API_BASE_URL + p)} alt="profile" className="h-24 w-full rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm" />
+                        <button
+                          type="button"
+                          aria-label="Remove photo"
+                          title="Remove photo"
+                          onClick={() => handleDeletePhoto(p)}
+                          className="absolute top-1 right-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white text-sm leading-none shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-white/80 z-10"
+                        >
+                          ×
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </div>

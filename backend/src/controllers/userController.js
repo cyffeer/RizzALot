@@ -1,6 +1,9 @@
 import User from '../models/User.js';
 import Match from '../models/Match.js';
 import { computeMutualInterests } from '../utils/matchUtils.js';
+import fs from 'fs';
+import path from 'path';
+import { uploadsDir } from '../middleware/upload.js';
 
 // Static options for onboarding questions (can be moved to DB later)
 export const questionOptions = {
@@ -45,6 +48,57 @@ export const uploadProfilePhotos = async (req, res) => {
   // Keep legacy single photo in sync with first photo if empty
   if (!me.photo && me.photos.length > 0) me.photo = me.photos[0];
   await me.save();
+  const safe = await User.findById(me._id).select('-password');
+  return res.json(safe);
+};
+
+export const removeProfilePhoto = async (req, res) => {
+  // Remove a photo by exact path or by index
+  const p = req.query.path;
+  const idxParam = req.query.index;
+
+  const me = await User.findById(req.user.id);
+  if (!me) return res.status(404).json({ message: 'User not found' });
+
+  let removedPath = null;
+  if (typeof idxParam !== 'undefined') {
+    const idx = parseInt(idxParam, 10);
+    if (!Number.isNaN(idx) && idx >= 0 && idx < (me.photos?.length || 0)) {
+      removedPath = me.photos[idx];
+      me.photos.splice(idx, 1);
+    }
+  } else if (p) {
+    const i = (me.photos || []).indexOf(p);
+    if (i !== -1) {
+      removedPath = me.photos[i];
+      me.photos.splice(i, 1);
+    }
+  }
+
+  // If nothing removed, return current state
+  if (!removedPath) {
+    const safe = await User.findById(me._id).select('-password');
+    return res.json(safe);
+  }
+
+  // Keep legacy single photo in sync if necessary
+  if (me.photo === removedPath) {
+    me.photo = me.photos?.[0] || null;
+  } else if (!me.photo && (me.photos?.length || 0) > 0) {
+    me.photo = me.photos[0];
+  }
+
+  await me.save();
+
+  // Best-effort delete from disk if it's one of our uploads
+  try {
+    if (removedPath && removedPath.startsWith('/uploads/')) {
+      const filename = path.basename(removedPath);
+      const filePath = path.join(uploadsDir, filename);
+      if (fs.existsSync(filePath)) fs.unlink(filePath, () => {});
+    }
+  } catch {}
+
   const safe = await User.findById(me._id).select('-password');
   return res.json(safe);
 };
